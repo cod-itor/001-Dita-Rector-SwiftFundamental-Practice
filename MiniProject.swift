@@ -1,5 +1,6 @@
-import Foundation
 
+
+// MARK: - M1: Data Model, Add Student, View Students
 struct Student {
     let id: Int
     var name: String
@@ -9,7 +10,12 @@ struct Student {
 
     var average: Double? {
         guard !scores.isEmpty else { return nil }
-        return Double(scores.reduce(0, +)) / Double(scores.count)
+        
+        var total = 0
+        for score in scores {
+            total += score
+        }
+        return Double(total) / Double(scores.count)
     }
 
     var grade: String {
@@ -31,7 +37,7 @@ var students: [Student] = []
 
 func readString(prompt: String) -> String {
     print(prompt, terminator: "")
-    return readLine()?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return readLine() ?? ""
 }
 
 func readInt(prompt: String, errorMsg: String) -> Int? {
@@ -114,11 +120,10 @@ func displayStudents(_ list: [Student]) {
         print("No students yet.")
         return
     }
-
-    print(String(format: "%-6s %-15s %-10s %-5s", "ID", "Name", "Average", "Grade"))
+    print("ID\tName\t\tAverage\tGrade")
     for s in list {
         let avgStr = formatAverage(s.average)
-        print(String(format: "%-6d %-15s %-10s %-5s", s.id, s.name, avgStr, s.grade))
+        print("\(s.id)\t\(s.name)\t\t\(avgStr)\t\(s.grade)")
     }
 }
 
@@ -126,6 +131,7 @@ func viewAllStudents() {
     displayStudents(students)
 }
 
+// MARK: - M2: Search, Update, Delete
 func searchStudent() {
     let query = readString(prompt: "Search by exact ID or part of Name: ").lowercased()
 
@@ -197,6 +203,7 @@ func deleteStudent() {
     }
 }
 
+// MARK: - M3: Scores, Averages, Grades, Class Report
 func addScore() {
     guard let id = readInt(prompt: "Student ID: ", errorMsg: "Invalid ID.") else { return }
     guard let index = findStudentIndex(id: id) else {
@@ -223,7 +230,13 @@ func classReport() {
         return
     }
 
-    let classTotal = studentsWithScores.compactMap { $0.average }.reduce(0, +)
+    var classTotal = 0.0
+    for student in studentsWithScores {
+        if let avg = student.average {
+            classTotal += avg
+        }
+    }
+    
     let classAverage = classTotal / Double(studentsWithScores.count)
 
     print("Total Students: \(students.count)")
@@ -231,6 +244,7 @@ func classReport() {
     print("Class Average: \(formatAverage(classAverage))")
 }
 
+// MARK: - M4: Filter and Sort
 func filterAndSort() {
     print("""
     1. Filter by Grade (A, B, C, D, F)
@@ -260,6 +274,7 @@ func filterAndSort() {
     displayStudents(resultList)
 }
 
+// MARK: - Main Menu (Includes M5: Validation and Error Handling throughout the menu loop)
 func showMenu() {
     print("""
 
